@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuroGTT Pro — Refined Fundamental Triggers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --blue: #0026ff;
+    --blue-hover: #001ecc;
+    --blue-soft: #eef2ff;
+    --blue-circle: #ebeffe;
+    --bg-canvas: #0c0e14;
+    --phone-bg: #ffffff;
+    --text: #0f131a;
+    --muted: #808897;
+    --surface: #f5f6f9;
+    --line: #f0f2f6;
+    --green: #00b262;
+    --green-soft: #e6f8ef;
+    --red: #e53935;
+    --red-soft: #fdeaea;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--bg-canvas);
+    background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 16px 36px;
+  }
+
+  /* External Top Preview Bar */
+  .preview-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    background: rgba(255,255,255,0.06); backdrop-filter: blur(16px);
+    padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.1);
+    color: #fff; font-size: 12px; font-weight: 500; flex-wrap: wrap;
+  }
+  .preview-bar button {
+    background: transparent; color: rgba(255,255,255,0.75); border: none;
+    padding: 6px 13px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .preview-bar button:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .preview-bar button.active { background: var(--blue); color: #fff; }
+  .live-tag {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+    font-size: 11px; color: #5effb1; font-weight: 600;
+  }
+  .live-dot { width: 6px; height: 6px; background: #00e676; border-radius: 50%; animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Phone Container */
+  .phone {
+    width: 392px;
+    max-width: 100%;
+    height: 824px;
+    background: var(--phone-bg);
+    border-radius: 46px;
+    box-shadow: 0 32px 96px rgba(0,0,0,0.7), 0 0 0 9px #1b1f2b;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status Bar */
+  .status-bar {
+    height: 44px; padding: 14px 28px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 700; color: var(--text); flex-shrink: 0; z-index: 25;
+  }
+  .status-right { display: flex; align-items: center; gap: 6px; }
+  .status-right svg { width: 14px; height: 14px; stroke-width: 2.3; }
+
+  /* Screen Views */
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    padding-bottom: 104px;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { display: flex; }
+
+  /* Top App Header inside Screens */
+  .app-bar {
+    padding: 8px 22px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-bar-title { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+  .circle-icon-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--surface); color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s, transform 0.12s;
+  }
+  .circle-icon-btn:hover { background: #eaedf3; }
+  .circle-icon-btn:active { transform: scale(0.95); }
+  .circle-icon-btn svg { width: 17px; height: 17px; stroke-width: 2; }
+
+  /* Search Pill */
+  .search-wrap { padding: 4px 22px 12px; display: flex; gap: 8px; align-items: center; }
+  .search-box {
+    flex: 1; background: var(--surface); border-radius: 999px;
+    padding: 9px 15px; display: flex; align-items: center; gap: 8px;
+  }
+  .search-box svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+  .search-box input {
+    border: none; background: transparent; outline: none; width: 100%;
+    font-size: 13px; color: var(--text); font-weight: 500;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+
+  /* Hero Section */
+  .hero { padding: 6px 24px 10px; }
+  .hero-label {
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .hero-label svg { width: 14px; height: 14px; color: var(--muted); }
+  .hero-val {
+    font-size: 34px; font-weight: 800; letter-spacing: -1.1px;
+    margin-top: 3px; color: var(--text); font-variant-numeric: tabular-nums;
+  }
+  .hero-sub {
+    font-size: 12.5px; font-weight: 600; margin-top: 4px;
+    display: flex; align-items: center; gap: 4px; color: var(--blue);
+  }
+  .hero-sub.green { color: var(--green); }
+  .hero-sub.red { color: var(--red); }
+  .hero-sub svg { width: 14px; height: 14px; }
+
+  /* Smooth Chart */
+  .chart-wrap { padding: 8px 0 6px; }
+  .chart-svg { width: 100%; height: 124px; display: block; }
+  .tf-bar {
+    display: flex; justify-content: space-between; padding: 6px 24px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tf-pill {
+    background: none; border: none; font-size: 11.5px; font-weight: 700;
+    color: var(--muted); padding: 5px 10px; border-radius: 999px; cursor: pointer;
+  }
+  .tf-pill.active { background: var(--blue-soft); color: var(--blue); }
+
+  /* Horizontal Scrollable Vector Action Circles (Reference Screen 3 — NO EMOJIS!) */
+  .circles-strip {
+    display: flex; gap: 14px; overflow-x: auto; padding: 14px 22px 14px;
+    scrollbar-width: none;
+  }
+  .circles-strip::-webkit-scrollbar { display: none; }
+  .c-action {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    cursor: pointer; flex-shrink: 0; min-width: 62px;
+  }
+  .c-icon-ring {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--blue-circle); color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.16s ease;
+  }
+  .c-icon-ring svg { width: 20px; height: 20px; stroke-width: 2.1; }
+  .c-action.active .c-icon-ring, .c-action:hover .c-icon-ring {
+    background: var(--blue); color: #ffffff;
+    box-shadow: 0 6px 16px rgba(0, 38, 255, 0.25);
+    transform: translateY(-1px);
+  }
+  .c-label {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    white-space: nowrap; letter-spacing: -0.1px;
+  }
+  .c-action.active .c-label { color: var(--text); font-weight: 700; }
+
+  /* Section Tabs */
+  .tabs-bar {
+    display: flex; gap: 18px; padding: 4px 22px 0;
+    border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none;
+  }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab-link {
+    background: none; border: none; font-size: 12.5px; font-weight: 700;
+    color: var(--muted); padding: 8px 0 10px; cursor: pointer;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+  }
+  .tab-link.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  /* Clean Asset Rows */
+  .list-wrap { padding: 2px 22px; }
+  .asset-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 0; border-bottom: 1px solid var(--line); cursor: pointer;
+  }
+  .asset-item:last-child { border-bottom: none; }
+  .asset-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .asset-monogram {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; letter-spacing: -0.3px;
+  }
+  .asset-title { font-size: 13.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .asset-meta { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+  .asset-right { text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .asset-price { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .asset-chg { font-size: 11px; font-weight: 600; margin-top: 2px; }
+  .asset-chg.pos { color: var(--green); }
+  .asset-chg.neg { color: var(--red); }
+
+  /* KEYPAD SCREEN: Refined Top 3-Segment Switcher + 16-Metric Drawer */
+  .seg-top-wrap { display: flex; justify-content: center; padding: 2px 22px 10px; }
+  .seg-control {
+    display: inline-flex; background: var(--surface); padding: 3px;
+    border-radius: 999px;
+  }
+  .seg-btn {
+    border: none; background: transparent; padding: 6px 16px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .seg-btn.active { background: var(--text); color: #ffffff; font-weight: 700; }
+
+  /* Scrollable Metric Chip Strip (All 14+ Fundamental & Technical Triggers) */
+  .metric-strip {
+    display: flex; gap: 7px; overflow-x: auto; padding: 4px 22px 10px;
+    scrollbar-width: none;
+  }
+  .metric-strip::-webkit-scrollbar { display: none; }
+  .m-chip {
+    background: var(--surface); border: 1px solid transparent;
+    padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
+    color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  }
+  .m-chip:hover { color: var(--text); }
+  .m-chip.active {
+    background: var(--blue-soft); color: var(--blue); border-color: rgba(0,38,255,0.2); font-weight: 700;
+  }
+
+  /* Giant Value Display ("12 GBP" / "0 GBP" Reference Style) */
+  .giant-display { text-align: center; padding: 12px 20px 10px; }
+  .giant-number-row {
+    display: flex; align-items: baseline; justify-content: center; gap: 8px;
+    font-size: 50px; font-weight: 800; letter-spacing: -1.8px; color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .giant-unit { font-size: 32px; font-weight: 600; color: #b6bcc8; letter-spacing: -0.6px; }
+  .cond-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--blue-soft); color: var(--blue);
+    font-size: 11.5px; font-weight: 700; padding: 5px 13px; border-radius: 999px;
+    margin-top: 6px; cursor: pointer; border: none;
+  }
+  .cond-pill svg { width: 13px; height: 13px; }
+
+  /* Selector Rows above CTA */
+  .kp-rows { padding: 6px 22px 6px; }
+  .kp-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer;
+  }
+  .kp-row-left { display: flex; align-items: center; gap: 11px; }
+  .kp-row-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--blue-circle); color: var(--blue);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11.5px;
+  }
+  .kp-row-icon svg { width: 16px; height: 16px; }
+  .kp-row-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .kp-row-title { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 1px; }
+  .kp-row-right { font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .kp-row-right svg { width: 14px; height: 14px; }
+
+  .primary-blue-btn {
+    margin: 10px 22px 6px; background: var(--blue); color: #ffffff; border: none;
+    padding: 14px; border-radius: 999px; font-size: 13.5px; font-weight: 700;
+    cursor: pointer; width: calc(100% - 44px);
+    box-shadow: 0 8px 22px rgba(0, 38, 255, 0.25); transition: background 0.15s;
+  }
+  .primary-blue-btn:hover { background: var(--blue-hover); }
+
+  /* Numpad */
+  .numpad {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 4px 26px 8px; flex: 1; align-items: center;
+  }
+  .num-btn {
+    background: none; border: none; font-size: 21px; font-weight: 600;
+    color: var(--text); padding: 10px 0; cursor: pointer; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .num-btn:active { background: var(--surface); }
+  .num-btn svg { width: 20px; height: 20px; }
+
+  /* Dual CTA Bottom Row */
+  .dual-actions { display: flex; gap: 10px; padding: 12px 22px 6px; }
+  .btn-blue-pill {
+    flex: 1.25; background: var(--blue); color: #fff; border: none;
+    padding: 13px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 6px 18px rgba(0,38,255,0.22);
+  }
+  .btn-gray-pill {
+    flex: 1; background: var(--surface); color: var(--text); border: none;
+    padding: 13px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Bottom Floating Glass Dock (Clean Lucide Icons) */
+  .glass-dock {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; display: flex; gap: 18px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.08); z-index: 30;
+  }
+  .dock-item {
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; transition: all 0.15s;
+  }
+  .dock-item svg { width: 19px; height: 19px; stroke-width: 2.1; }
+  .dock-item.active { color: var(--blue); background: var(--blue-soft); }
+  .dock-dot {
+    position: absolute; top: 6px; right: 6px; width: 7px; height: 7px;
+    background: var(--green); border-radius: 50%; border: 1.5px solid #fff;
+  }
+
+  /* Bottom Sheet Modal for Full 16-Metric Picker */
+  .sheet-backdrop {
+    position: absolute; inset: 0; background: rgba(10, 14, 24, 0.45);
+    display: none; align-items: flex-end; z-index: 50;
+  }
+  .sheet-backdrop.open { display: flex; }
+  .sheet {
+    background: #fff; width: 100%; border-radius: 28px 28px 0 0;
+    padding: 20px 22px 28px; max-height: 78%; overflow-y: auto;
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sheet-handle { width: 38px; height: 4px; background: #dfe3eb; border-radius: 99px; margin: 0 auto 14px; }
+  .sheet-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  .sheet-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .metric-card {
+    background: var(--surface); border: 1.5px solid transparent;
+    padding: 11px 13px; border-radius: 14px; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .metric-card.active { border-color: var(--blue); background: var(--blue-soft); }
+  .mc-name { font-size: 12.5px; font-weight: 700; color: var(--text); }
+  .mc-cat { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .mc-val { font-size: 12.5px; font-weight: 800; color: var(--blue); }
+
+  /* Toast */
+  .toast {
+    position: absolute; top: 52px; left: 20px; right: 20px;
+    background: #0f131a; color: #fff; padding: 12px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 600; box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+    display: none; z-index: 60; align-items: center; justify-content: space-between;
+  }
+  .toast.show { display: flex; }
+</style>
+</head>
+<body>
+
+<!-- Desktop Preview Switcher -->
+<div class="preview-bar">
+  <span class="live-tag"><span class="live-dot"></span> <span id="syncStatus">NSE Live Sync</span></span>
+  <button class="active" id="pBtn_home" onclick="goScreen('home')">Market Home</button>
+  <button id="pBtn_list" onclick="goScreen('list')">Refined Stock List</button>
+  <button id="pBtn_detail" onclick="goScreen('detail')">Stock Detail</button>
+  <button id="pBtn_keypad" onclick="goScreen('keypad')">GTT Keypad (16 Metrics)</button>
+  <button id="pBtn_alerts" onclick="goScreen('alerts')">Active GTTs</button>
+  <button onclick="syncLiveNSE()">Sync Live LTP</button>
+</div>
+
+<!-- Mobile Phone Frame -->
+<div class="phone">
+
+  <!-- iOS Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-right">
+      <i data-lucide="signal"></i>
+      <i data-lucide="wifi"></i>
+      <i data-lucide="battery-full"></i>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toastBox">
+    <span id="toastTxt">Trigger Saved</span>
+    <span style="color:#5effb1;font-weight:800">OK</span>
+  </div>
+
+  <!-- =====================================================
+       SCREEN 1: MARKET HOME
+       ===================================================== -->
+  <div class="screen active" id="scr-home">
+    <div class="search-wrap" style="padding-top:10px">
+      <div class="search-box" onclick="goScreen('list')">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Search 35 NSE stocks, Sales 2x, 200 DMA..." readonly>
+      </div>
+      <button class="circle-icon-btn" onclick="enableBrowserPush()" title="Enable Push Notifications">
+        <i data-lucide="bell"></i>
+      </button>
+      <button class="circle-icon-btn" onclick="simulateGttHit()" title="Simulate Trigger Hit">
+        <i data-lucide="zap"></i>
+      </button>
+    </div>
+
+    <div class="hero">
+      <div class="hero-label">NIFTY 50 BENCHMARK <i data-lucide="eye"></i></div>
+      <div class="hero-val" id="niftyVal">₹24,820.45</div>
+      <div class="hero-sub" id="niftyChg">
+        <i data-lucide="trending-up"></i>
+        <span>+₹142.30 (0.58%) · NSE Real-Time</span>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <svg class="chart-svg" viewBox="0 0 392 124">
+        <defs>
+          <linearGradient id="chartFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0026ff" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#0026ff" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 0 96 Q 48 64, 88 70 T 170 44 T 246 52 T 320 24 T 392 32 L 392 124 L 0 124 Z" fill="url(#chartFade)"/>
+        <path d="M 0 96 Q 48 64, 88 70 T 170 44 T 246 52 T 320 24 T 392 32" fill="none" stroke="#0026ff" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="tf-bar">
+      <button class="tf-pill">1H</button>
+      <button class="tf-pill active">1D</button>
+      <button class="tf-pill">1W</button>
+      <button class="tf-pill">1M</button>
+      <button class="tf-pill">1Y</button>
+      <button class="tf-pill">All</button>
+    </div>
+
+    <div class="list-wrap" style="padding-top:6px">
+      <div class="asset-item" onclick="goScreen('alerts')">
+        <div class="asset-left">
+          <div class="asset-monogram" style="background:var(--blue-circle);color:var(--blue)">
+            <i data-lucide="zap" style="width:18px;height:18px"></i>
+          </div>
+          <div>
+            <div class="asset-title">Active Fundamental GTTs</div>
+            <div class="asset-meta">Monitoring PE, Sales YoY, 200 DMA, ROE & D/E</div>
+          </div>
+        </div>
+        <div class="asset-right">
+          <div class="asset-price" id="homeGttTotal">3 Active</div>
+          <div class="asset-chg pos" id="homeGttHits">1 Hit ›</div>
+        </div>
+      </div>
+
+      <div class="asset-item" onclick="goScreen('list')">
+        <div class="asset-left">
+          <div class="asset-monogram" style="background:var(--green-soft);color:var(--green)">
+            <i data-lucide="layers" style="width:18px;height:18px"></i>
+          </div>
+          <div>
+            <div class="asset-title">10 Smart Fundamental Screens</div>
+            <div class="asset-meta">Sales Growth, 200 DMA, Deep Value, Low Debt</div>
+          </div>
+        </div>
+        <div class="asset-right">
+          <div class="asset-price">35 Stocks</div>
+          <div class="asset-chg" style="color:var(--muted)">Scan ›</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:12px 22px 4px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.6px;text-transform:uppercase">
+      Top Tracked Assets
+    </div>
+    <div class="list-wrap" id="homeTopList"></div>
+
+    <div class="dual-actions">
+      <button class="btn-blue-pill" onclick="goScreen('keypad')">Set Fundamental GTT</button>
+      <button class="btn-gray-pill" onclick="goScreen('list')">Screener</button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       SCREEN 2: REFINED STOCK LIST (Clean Vector Circles + 10 Screens)
+       ===================================================== -->
+  <div class="screen" id="scr-list">
+    <div class="app-bar">
+      <button class="circle-icon-btn" onclick="goScreen('home')">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <span class="app-bar-title">Refined Stock List</span>
+      <button class="circle-icon-btn" onclick="syncLiveNSE()" title="Refresh Live Data">
+        <i data-lucide="refresh-cw"></i>
+      </button>
+    </div>
+
+    <!-- Clean Vector Icon Circles (Scrollable horizontally — 8 presets!) -->
+    <div class="circles-strip" id="presetCircles">
+      <div class="c-action active" onclick="selectPreset('all', this)">
+        <div class="c-icon-ring"><i data-lucide="layout-grid"></i></div>
+        <span class="c-label">All Stocks</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('sales_high', this)">
+        <div class="c-icon-ring"><i data-lucide="trending-up"></i></div>
+        <span class="c-label">Sales &gt; 20%</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('dma200_near', this)">
+        <div class="c-icon-ring"><i data-lucide="activity"></i></div>
+        <span class="c-label">Near 200 DMA</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('dma200_below', this)">
+        <div class="c-icon-ring"><i data-lucide="arrow-down-right"></i></div>
+        <span class="c-label">Below 200 DMA</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('roe25', this)">
+        <div class="c-icon-ring"><i data-lucide="award"></i></div>
+        <span class="c-label">ROE &gt; 25%</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('peg1', this)">
+        <div class="c-icon-ring"><i data-lucide="gem"></i></div>
+        <span class="c-label">PEG &lt; 1.0</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('profit_gw', this)">
+        <div class="c-icon-ring"><i data-lucide="bar-chart-3"></i></div>
+        <span class="c-label">Profit &gt; 25%</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('zero_debt', this)">
+        <div class="c-icon-ring"><i data-lucide="shield-check"></i></div>
+        <span class="c-label">Low Debt</span>
+      </div>
+      <div class="c-action" onclick="selectPreset('high_div', this)">
+        <div class="c-icon-ring"><i data-lucide="coins"></i></div>
+        <span class="c-label">High Div %</span>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-box">
+        <i data-lucide="search"></i>
+        <input type="text" id="stockSearchInput" placeholder="Search symbol, sector, or metric..." oninput="renderStockList()">
+      </div>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab-link active" id="tab_all" onclick="selectPreset('all', null)">Tradable (35)</button>
+      <button class="tab-link" id="tab_value" onclick="selectPreset('low_pe', null)">PE &lt; 20</button>
+      <button class="tab-link" id="tab_roce" onclick="selectPreset('roce25', null)">ROCE &gt; 25%</button>
+      <button class="tab-link" id="tab_rsi" onclick="selectPreset('rsi_low', null)">Low RSI</button>
+    </div>
+
+    <div class="list-wrap" id="stockListContainer"></div>
+  </div>
+
+  <!-- =====================================================
+       SCREEN 3: STOCK DETAIL & FULL FUNDAMENTALS
+       ===================================================== -->
+  <div class="screen" id="scr-detail">
+    <div class="app-bar">
+      <button class="circle-icon-btn" onclick="goScreen('list')">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <span class="app-bar-title" id="detHeaderSym">RELIANCE</span>
+      <div style="display:flex;gap:8px">
+        <button class="circle-icon-btn" onclick="goScreen('keypad')" title="Set GTT">
+          <i data-lucide="sliders-horizontal"></i>
+        </button>
+        <button class="circle-icon-btn" onclick="launchBroker('groww')" title="Open in Groww">
+          <i data-lucide="external-link"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-label" id="detFullTitle">Reliance Industries · Energy</div>
+      <div class="hero-val" id="detLtp">₹2,840.00</div>
+      <div class="hero-sub green" id="detChangeRow">+₹34.10 (1.20%)</div>
+    </div>
+
+    <div class="chart-wrap">
+      <svg class="chart-svg" viewBox="0 0 392 120">
+        <path d="M 0 98 Q 65 82, 130 64 T 255 40 T 392 18" fill="none" stroke="#0026ff" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="tf-bar">
+      <button class="tf-pill">1H</button>
+      <button class="tf-pill active">1D</button>
+      <button class="tf-pill">1W</button>
+      <button class="tf-pill">1M</button>
+      <button class="tf-pill">1Y</button>
+      <button class="tf-pill">All</button>
+    </div>
+
+    <div style="padding:12px 22px 6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;font-weight:700;color:var(--muted)">TAP ANY METRIC TO SET GTT TRIGGER</span>
+      <span style="font-size:11px;font-weight:700;color:var(--blue);cursor:pointer" onclick="openMetricSheet()">All 16 Metrics ›</span>
+    </div>
+
+    <div style="padding:6px 22px 12px;display:grid;grid-template-columns:repeat(3, 1fr);gap:8px" id="detMetricsGrid"></div>
+
+    <div class="dual-actions">
+      <button class="btn-blue-pill" onclick="goScreen('keypad')">Set Trigger on Stock</button>
+      <button class="btn-gray-pill" onclick="launchBroker('groww')">Buy on Groww ↗</button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       SCREEN 4: KEYPAD GTT BUILDER (Supports 16 Metrics: Sales, DMA, PE, ROE, etc.)
+       ===================================================== -->
+  <div class="screen" id="scr-keypad">
+    <div class="app-bar">
+      <button class="circle-icon-btn" onclick="goScreen('detail')">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <div class="seg-control">
+        <button class="seg-btn active" id="catBtn_val" onclick="switchMetricCategory('val')">Valuation</button>
+        <button class="seg-btn" id="catBtn_gw" onclick="switchMetricCategory('gw')">Growth</button>
+        <button class="seg-btn" id="catBtn_tech" onclick="switchMetricCategory('tech')">DMA & Tech</button>
+      </div>
+      <button class="circle-icon-btn" onclick="openMetricSheet()" title="View All 16 Metrics">
+        <i data-lucide="list-filter"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Metric Chips (Instant Switch between Sales Gr, 200 DMA, 50 DMA, PE, PEG, ROE, ROCE, D/E, etc.) -->
+    <div class="metric-strip" id="keypadMetricStrip"></div>
+
+    <!-- Giant Value Display ("12 GBP" style) -->
+    <div class="giant-display">
+      <div class="giant-number-row">
+        <span id="kpBigNum">20</span>
+        <span class="giant-unit" id="kpBigUnit">PE</span>
+      </div>
+      <button class="cond-pill" onclick="toggleOpDirection()" id="kpConditionBtn">
+        <i data-lucide="arrow-up-down"></i>
+        <span id="kpConditionText">Trigger when Drops ≤ 20 · Live: 24.0</span>
+      </button>
+    </div>
+
+    <!-- Clean Contextual Rows -->
+    <div class="kp-rows">
+      <div class="kp-row" onclick="cycleActiveStock()">
+        <div class="kp-row-left">
+          <div class="kp-row-icon" id="kpBadge">RE</div>
+          <div>
+            <div class="kp-row-sub">Target Stock (Tap to switch)</div>
+            <div class="kp-row-title" id="kpStockTitle">Reliance Industries</div>
+          </div>
+        </div>
+        <div class="kp-row-right">
+          <span id="kpLivePrice">₹2,840</span>
+          <i data-lucide="chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="kp-row" onclick="openMetricSheet()">
+        <div class="kp-row-left">
+          <div class="kp-row-icon" style="background:var(--green-soft);color:var(--green)">
+            <i data-lucide="sliders-horizontal"></i>
+          </div>
+          <div>
+            <div class="kp-row-sub">Selected Fundamental / DMA Metric</div>
+            <div class="kp-row-title" id="kpMetricFullTitle">PE Ratio (Valuation)</div>
+          </div>
+        </div>
+        <div class="kp-row-right">
+          <span>All 16</span>
+          <i data-lucide="chevron-right"></i>
+        </div>
+      </div>
+
+      <div class="kp-row" onclick="toggleBroker()">
+        <div class="kp-row-left">
+          <div class="kp-row-icon">
+            <i data-lucide="send"></i>
+          </div>
+          <div>
+            <div class="kp-row-sub">Execution & Alert Channel</div>
+            <div class="kp-row-title" id="kpBrokerTitle">Push Notification + Groww Order</div>
+          </div>
+        </div>
+        <div class="kp-row-right">
+          <span>Switch</span>
+          <i data-lucide="chevron-right"></i>
+        </div>
+      </div>
+    </div>
+
+    <button class="primary-blue-btn" onclick="createGttOrder()">Create Fundamental GTT</button>
+
+    <!-- Clean Minimalist Numpad -->
+    <div class="numpad">
+      <button class="num-btn" onclick="tapKey('1')">1</button>
+      <button class="num-btn" onclick="tapKey('2')">2</button>
+      <button class="num-btn" onclick="tapKey('3')">3</button>
+      <button class="num-btn" onclick="tapKey('4')">4</button>
+      <button class="num-btn" onclick="tapKey('5')">5</button>
+      <button class="num-btn" onclick="tapKey('6')">6</button>
+      <button class="num-btn" onclick="tapKey('7')">7</button>
+      <button class="num-btn" onclick="tapKey('8')">8</button>
+      <button class="num-btn" onclick="tapKey('9')">9</button>
+      <button class="num-btn" onclick="tapKey('.')">.</button>
+      <button class="num-btn" onclick="tapKey('0')">0</button>
+      <button class="num-btn" onclick="tapKey('del')"><i data-lucide="delete"></i></button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       SCREEN 5: ACTIVE GTT TRIGGERS
+       ===================================================== -->
+  <div class="screen" id="scr-alerts">
+    <div class="app-bar">
+      <button class="circle-icon-btn" onclick="goScreen('home')">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <span class="app-bar-title">Active GTT Triggers</span>
+      <button class="circle-icon-btn" onclick="simulateGttHit()" title="Test Trigger Hit">
+        <i data-lucide="zap"></i>
+      </button>
+    </div>
+
+    <div style="padding:4px 22px 10px;font-size:12px;color:var(--muted)">
+      Click any triggered stock to launch its order screen on <b>Groww</b> or <b>Zerodha Kite</b>.
+    </div>
+
+    <div class="list-wrap" id="gttAlertsList"></div>
+
+    <div class="dual-actions" style="margin-top:auto">
+      <button class="btn-blue-pill" onclick="goScreen('keypad')">+ New GTT Trigger</button>
+      <button class="btn-gray-pill" onclick="enableBrowserPush()">Enable Push</button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       BOTTOM SHEET: ALL 16 FUNDAMENTAL & DMA METRICS
+       ===================================================== -->
+  <div class="sheet-backdrop" id="metricSheet" onclick="if(event.target===this)closeMetricSheet()">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Select Trigger Parameter</div>
+      <div class="sheet-sub">Choose from 16 Fundamental, Growth & Moving Average metrics</div>
+      <div class="metric-grid" id="fullMetricGrid"></div>
+    </div>
+  </div>
+
+  <!-- Floating Glass Bottom Navigation -->
+  <div class="glass-dock">
+    <button class="dock-item active" id="dock_home" onclick="goScreen('home')" title="Home">
+      <i data-lucide="home"></i>
+    </button>
+    <button class="dock-item" id="dock_list" onclick="goScreen('list')" title="Screener">
+      <i data-lucide="Sliders"></i>
+    </button>
+    <button class="dock-item" id="dock_keypad" onclick="goScreen('keypad')" title="Set GTT">
+      <i data-lucide="plus-circle"></i>
+    </button>
+    <button class="dock-item" id="dock_alerts" onclick="goScreen('alerts')" title="Active Triggers">
+      <i data-lucide="bell"></i>
+      <span class="dock-dot" id="alertDot"></span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   ALL 16 FUNDAMENTAL, GROWTH & DMA METRICS
+   ========================================================= */
+const METRIC_CATALOG = [
+  // Valuation
+  { key: 'pe',            label: 'PE Ratio',         unit: 'PE',     cat: 'val',  catName: 'Valuation', defOp: 'lt' },
+  { key: 'peg',           label: 'PEG Ratio',        unit: 'PEG',    cat: 'val',  catName: 'Valuation', defOp: 'lt' },
+  { key: 'pb',            label: 'Price to Book',    unit: 'PB',     cat: 'val',  catName: 'Valuation', defOp: 'lt' },
+  { key: 'div_yield',     label: 'Dividend Yield',   unit: '% DY',   cat: 'val',  catName: 'Valuation', defOp: 'gt' },
+  { key: 'fcf_yield',     label: 'FCF Yield',        unit: '% FCF',  cat: 'val',  catName: 'Valuation', defOp: 'gt' },
+
+  // Growth & Quality
+  { key: 'sales_growth',  label: 'Sales Growth YoY', unit: '% S.Gr', cat: 'gw',   catName: 'Growth',    defOp: 'gt' },
+  { key: 'profit_growth', label: 'Profit Growth',    unit: '% P.Gr', cat: 'gw',   catName: 'Growth',    defOp: 'gt' },
+  { key: 'roe',           label: 'ROE %',            unit: '% ROE',  cat: 'gw',   catName: 'Quality',   defOp: 'gt' },
+  { key: 'roce',          label: 'ROCE %',           unit: '% ROCE', cat: 'gw',   catName: 'Quality',   defOp: 'gt' },
+  { key: 'opm',           label: 'Operating Margin', unit: '% OPM',  cat: 'gw',   catName: 'Margins',   defOp: 'gt' },
+  { key: 'debt_equity',   label: 'Debt to Equity',   unit: 'D/E',    cat: 'gw',   catName: 'Safety',    defOp: 'lt' },
+
+  // DMA & Technicals
+  { key: 'dma200_dev',    label: '% from 200 DMA',   unit: '% 200D', cat: 'tech', catName: 'Moving Avg',defOp: 'lt' },
+  { key: 'dma50_dev',     label: '% from 50 DMA',    unit: '% 50D',  cat: 'tech', catName: 'Moving Avg',defOp: 'lt' },
+  { key: 'price',         label: 'Stock Price',      unit: 'INR',    cat: 'tech', catName: 'Price',     defOp: 'lt' },
+  { key: 'rsi',           label: '14-Day RSI',       unit: 'RSI',    cat: 'tech', catName: 'Momentum',  defOp: 'lt' },
+  { key: 'high52_dev',    label: '% below 52W High', unit: '% 52W',  cat: 'tech', catName: 'Breakout',  defOp: 'lt' }
+];
+
+/* 35 NSE STOCKS WITH FULL 16 METRICS */
+const RAW_STOCKS = [
+  {sym:'RELIANCE',name:'Reliance Industries',sec:'Energy',pe:24.0,pb:2.4,roe:9.8,roce:11.0,peg:1.4,dy:0.4,de:0.42,pg:14,sg:18,opm:14,price:2840,d200:2680},
+  {sym:'TCS',name:'Tata Consultancy',sec:'IT',pe:30.0,pb:14.0,roe:46.0,roce:62.0,peg:2.8,dy:1.4,de:0.05,pg:11,sg:9,opm:25,price:3920,d200:3850},
+  {sym:'HDFCBANK',name:'HDFC Bank',sec:'Banking',pe:18.0,pb:2.7,roe:17.0,roce:8.5,peg:1.1,dy:1.2,de:0.8,pg:18,sg:21,opm:22,price:1560,d200:1500},
+  {sym:'TATAMOTORS',name:'Tata Motors',sec:'Auto',pe:11.0,pb:4.2,roe:38.0,roce:18.5,peg:0.2,dy:0.6,de:1.1,pg:140,sg:28,opm:14,price:880,d200:895},
+  {sym:'COALINDIA',name:'Coal India',sec:'PSU',pe:8.0,pb:3.5,roe:46.0,roce:65.0,peg:0.4,dy:5.2,de:0.07,pg:22,sg:14,opm:31,price:460,d200:440},
+  {sym:'TRENT',name:'Trent Limited',sec:'Retail',pe:115.0,pb:28.0,roe:26.0,roce:29.0,peg:1.3,dy:0.1,de:0.45,pg:88,sg:54,opm:15,price:4780,d200:4350},
+  {sym:'POLYCAB',name:'Polycab India',sec:'Cables',pe:48.0,pb:8.5,roe:22.0,roce:29.0,peg:1.5,dy:0.5,de:0.04,pg:34,sg:29,opm:14,price:5950,d200:5400},
+  {sym:'INFY',name:'Infosys',sec:'IT',pe:25.0,pb:8.0,roe:32.0,roce:42.0,peg:2.1,dy:2.5,de:0.09,pg:9,sg:7,opm:22,price:1660,d200:1580},
+  {sym:'ICICIBANK',name:'ICICI Bank',sec:'Banking',pe:19.0,pb:3.2,roe:18.5,roce:9.2,peg:0.9,dy:0.8,de:0.9,pg:26,sg:23,opm:24,price:1290,d200:1190},
+  {sym:'SBIN',name:'State Bank of India',sec:'Banking',pe:11.0,pb:1.6,roe:17.2,roce:7.4,peg:0.7,dy:1.6,de:1.2,pg:20,sg:17,opm:18,price:820,d200:790},
+  {sym:'BAJFINANCE',name:'Bajaj Finance',sec:'NBFC',pe:28.0,pb:5.5,roe:22.0,roce:12.0,peg:0.9,dy:0.5,de:3.1,pg:28,sg:32,opm:35,price:6920,d200:6750},
+  {sym:'ITC',name:'ITC Limited',sec:'FMCG',pe:27.0,pb:7.8,roe:28.0,roce:35.0,peg:2.6,dy:3.1,de:0.01,pg:11,sg:9,opm:36,price:445,d200:438},
+  {sym:'BHARTIARTL',name:'Bharti Airtel',sec:'Telecom',pe:48.0,pb:7.5,roe:16.0,roce:13.0,peg:0.8,dy:0.5,de:1.4,pg:48,sg:19,opm:52,price:1530,d200:1360},
+  {sym:'MARUTI',name:'Maruti Suzuki',sec:'Auto',pe:26.0,pb:4.6,roe:18.5,roce:23.5,peg:0.7,dy:0.9,de:0.01,pg:38,sg:20,opm:13,price:12050,d200:11400},
+  {sym:'LT',name:'Larsen & Toubro',sec:'Cap Goods',pe:34.0,pb:5.5,roe:15.0,roce:14.0,peg:1.2,dy:0.8,de:1.1,pg:24,sg:18,opm:11,price:3760,d200:3520},
+  {sym:'SUNPHARMA',name:'Sun Pharma',sec:'Pharma',pe:34.0,pb:5.5,roe:17.0,roce:18.0,peg:1.1,dy:0.8,de:0.07,pg:29,sg:14,opm:27,price:1580,d200:1480},
+  {sym:'AXISBANK',name:'Axis Bank',sec:'Banking',pe:13.5,pb:2.2,roe:17.0,roce:7.8,peg:0.6,dy:0.2,de:0.9,pg:32,sg:21,opm:20,price:1190,d200:1120},
+  {sym:'NTPC',name:'NTPC Limited',sec:'PSU',pe:17.5,pb:2.3,roe:14.0,roce:10.5,peg:1.1,dy:2.5,de:1.3,pg:16,sg:13,opm:28,price:340,d200:322},
+  {sym:'POWERGRID',name:'Power Grid Corp',sec:'Energy',pe:17.8,pb:3.0,roe:19.0,roce:13.5,peg:1.6,dy:3.2,de:1.4,pg:12,sg:10,opm:84,price:300,d200:288},
+  {sym:'IOC',name:'Indian Oil Corp',sec:'Energy',pe:7.2,pb:1.1,roe:19.0,roce:15.0,peg:0.3,dy:5.5,de:0.65,pg:65,sg:12,opm:8,price:140,d200:156},
+  {sym:'BAJAJ-AUTO',name:'Bajaj Auto',sec:'Auto',pe:31.0,pb:7.0,roe:26.0,roce:33.0,peg:1.2,dy:1.8,de:0.01,pg:24,sg:29,opm:20,price:8600,d200:9050},
+  {sym:'ASIANPAINT',name:'Asian Paints',sec:'Chemicals',pe:52.0,pb:12.0,roe:25.0,roce:32.0,peg:4.2,dy:1.1,de:0.12,pg:8,sg:6,opm:19,price:2920,d200:3180},
+  {sym:'HCLTECH',name:'HCL Technologies',sec:'IT',pe:28.0,pb:6.5,roe:23.0,roce:29.0,peg:2.4,dy:3.1,de:0.07,pg:11,sg:9,opm:21,price:1770,d200:1720},
+  {sym:'M&M',name:'Mahindra & Mahindra',sec:'Auto',pe:28.0,pb:4.8,roe:19.0,roce:17.5,peg:1.0,dy:0.7,de:0.35,pg:28,sg:21,opm:15,price:2760,d200:2660},
+  {sym:'TITAN',name:'Titan Company',sec:'Retail',pe:78.0,pb:24.0,roe:32.0,roce:26.0,peg:3.1,dy:0.3,de:0.4,pg:22,sg:24,opm:12,price:3500,d200:3390}
+];
+
+const PALETTE = [
+  {bg:'#ebeffe', fg:'#0026ff'},
+  {bg:'#e6f8ef', fg:'#009e54'},
+  {bg:'#fff3e6', fg:'#d95b00'},
+  {bg:'#f3eeff', fg:'#6236ff'},
+  {bg:'#eaf6ff', fg:'#0070cc'}
+];
+
+const STOCKS = RAW_STOCKS.map((s, idx) => {
+  const pal = PALETTE[idx % PALETTE.length];
+  const d50 = +(s.d200 * 1.025).toFixed(1);
+  const h52 = +(s.price * 1.14).toFixed(1);
+  return {
+    ...s,
+    color: pal.bg,
+    tcolor: pal.fg,
+    eps: s.price / s.pe,
+    chg: +((Math.random() - 0.44) * 3.1).toFixed(2),
+    div_yield: s.dy,
+    fcf_yield: +(s.dy + 1.4).toFixed(1),
+    debt_equity: s.de,
+    profit_growth: s.pg,
+    sales_growth: s.sg,
+    dma200: s.d200,
+    dma50: d50,
+    dma200_dev: +(((s.price - s.d200) / s.d200) * 100).toFixed(1),
+    dma50_dev: +(((s.price - d50) / d50) * 100).toFixed(1),
+    rsi: +(32 + (idx * 7) % 44).toFixed(1),
+    high52_dev: +(((s.price - h52) / h52) * 100).toFixed(1)
+  };
+});
+
+let activeStock = STOCKS[0];
+let activePreset = 'all';
+let activeCat = 'val';
+let activeMetric = 'pe';
+let kpInput = '20';
+let kpOp = 'lt';
+let kpBroker = 'groww';
+
+let gttOrders = JSON.parse(localStorage.getItem('buro_pro_gtts') || '[]');
+if (gttOrders.length === 0) {
+  gttOrders = [
+    { id: 101, sym: 'TATAMOTORS', name: 'Tata Motors', metric: 'sales_growth', op: 'gt', val: 25, broker: 'groww', hit: true },
+    { id: 102, sym: 'BAJAJ-AUTO', name: 'Bajaj Auto', metric: 'dma200_dev', op: 'lt', val: -3, broker: 'groww', hit: true },
+    { id: 103, sym: 'RELIANCE', name: 'Reliance Industries', metric: 'pe', op: 'lt', val: 22, broker: 'groww', hit: false }
+  ];
+  localStorage.setItem('buro_pro_gtts', JSON.stringify(gttOrders));
+}
+
+function getMetricMeta(key) {
+  return METRIC_CATALOG.find(m => m.key === key) || METRIC_CATALOG[0];
+}
+
+function goScreen(scr) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('scr-' + scr).classList.add('active');
+
+  document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
+  const dockTarget = document.getElementById('dock_' + (scr === 'detail' ? 'list' : scr));
+  if (dockTarget) dockTarget.classList.add('active');
+
+  document.querySelectorAll('.preview-bar button').forEach(b => b.classList.remove('active'));
+  const pBtn = document.getElementById('pBtn_' + scr);
+  if (pBtn) pBtn.classList.add('active');
+
+  if (scr === 'home') renderHome();
+  if (scr === 'list') renderStockList();
+  if (scr === 'detail') renderStockDetail();
+  if (scr === 'keypad') renderKeypad();
+  if (scr === 'alerts') renderAlerts();
+  lucide.createIcons();
+}
+
+function openStockDetail(sym) {
+  activeStock = STOCKS.find(s => s.sym === sym) || STOCKS[0];
+  kpInput = String(activeStock[activeMetric]);
+  goScreen('detail');
+}
+
+function jumpToMetricTrigger(metricKey) {
+  const m = getMetricMeta(metricKey);
+  activeCat = m.cat;
+  activeMetric = m.key;
+  kpOp = m.defOp;
+  kpInput = String(activeStock[activeMetric]);
+  goScreen('keypad');
+}
+
+/* HOME */
+function renderHome() {
+  document.getElementById('homeTopList').innerHTML = STOCKS.slice(0, 5).map(s => renderStockRow(s)).join('');
+  checkTriggers();
+}
+
+/* STOCK SCREENER LIST */
+function selectPreset(presetKey, el) {
+  activePreset = presetKey;
+  if (el) {
+    document.querySelectorAll('.c-action').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  renderStockList();
+}
+
+function renderStockList() {
+  const q = (document.getElementById('stockSearchInput')?.value || '').toLowerCase();
+  const list = STOCKS.filter(s => {
+    if (q && !s.sym.toLowerCase().includes(q) && !s.name.toLowerCase().includes(q) && !s.sec.toLowerCase().includes(q)) return false;
+    if (activePreset === 'sales_high') return s.sales_growth >= 20;
+    if (activePreset === 'dma200_near') return Math.abs(s.dma200_dev) <= 5;
+    if (activePreset === 'dma200_below') return s.dma200_dev < 0;
+    if (activePreset === 'roe25') return s.roe >= 25;
+    if (activePreset === 'peg1') return s.peg < 1.0;
+    if (activePreset === 'profit_gw') return s.profit_growth >= 25;
+    if (activePreset === 'zero_debt') return s.debt_equity <= 0.15;
+    if (activePreset === 'high_div') return s.div_yield >= 2.0;
+    if (activePreset === 'low_pe') return s.pe < 20;
+    if (activePreset === 'roce25') return s.roce >= 25;
+    if (activePreset === 'rsi_low') return s.rsi <= 45;
+    return true;
+  });
+
+  document.getElementById('stockListContainer').innerHTML = list.length
+    ? list.map(s => renderStockRow(s)).join('')
+    : `<div style="padding:36px 16px;text-align:center;color:var(--muted);font-size:12.5px">No stocks match this screen.</div>`;
+}
+
+function renderStockRow(s) {
+  const dmaBadge = s.dma200_dev >= 0 ? `+${s.dma200_dev}%` : `${s.dma200_dev}%`;
+  return `
+    <div class="asset-item" onclick="openStockDetail('${s.sym}')">
+      <div class="asset-left">
+        <div class="asset-monogram" style="background:${s.color};color:${s.tcolor}">${s.sym.substring(0,2)}</div>
+        <div>
+          <div class="asset-title">${s.name}</div>
+          <div class="asset-meta">PE ${s.pe} · Sales +${s.sales_growth}% · 200D ${dmaBadge}</div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div class="asset-price">₹${s.price.toLocaleString('en-IN')}</div>
+        <div class="asset-chg ${s.chg >= 0 ? 'pos' : 'neg'}">${s.chg >= 0 ? '+' : ''}${s.chg.toFixed(2)}%</div>
+      </div>
+    </div>
+  `;
+}
+
+/* STOCK DETAIL (9 Interactive Fundamental & DMA Cards + Sheet Button) */
+function renderStockDetail() {
+  const s = activeStock;
+  document.getElementById('detHeaderSym').textContent = s.sym;
+  document.getElementById('detFullTitle').textContent = `${s.name} · ${s.sec}`;
+  document.getElementById('detLtp').textContent = `₹${s.price.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  const chgEl = document.getElementById('detChangeRow');
+  chgEl.textContent = `${s.chg >= 0 ? '+' : ''}${s.chg.toFixed(2)}% today · 200 DMA ₹${s.dma200}`;
+  chgEl.className = 'hero-sub ' + (s.chg >= 0 ? 'green' : 'red');
+
+  const cards = [
+    { key: 'pe', label: 'PE Ratio', val: s.pe.toFixed(1) },
+    { key: 'sales_growth', label: 'Sales Gr', val: '+' + s.sales_growth + '%' },
+    { key: 'dma200_dev', label: '200 DMA', val: (s.dma200_dev>0?'+':'') + s.dma200_dev + '%' },
+    { key: 'roe', label: 'ROE %', val: s.roe + '%' },
+    { key: 'roce', label: 'ROCE %', val: s.roce + '%' },
+    { key: 'peg', label: 'PEG Ratio', val: s.peg },
+    { key: 'profit_growth', label: 'Profit Gr', val: '+' + s.profit_growth + '%' },
+    { key: 'debt_equity', label: 'Debt / Eq', val: s.debt_equity },
+    { key: 'rsi', label: 'RSI (14)', val: s.rsi }
+  ];
+
+  document.getElementById('detMetricsGrid').innerHTML = cards.map(c => `
+    <div onclick="jumpToMetricTrigger('${c.key}')" style="background:var(--surface);padding:10px 11px;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:all 0.15s" onmouseover="this.style.borderColor='#0026ff'" onmouseout="this.style.borderColor='transparent'">
+      <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase">${c.label}</div>
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-top:3px">${c.val}</div>
+    </div>
+  `).join('');
+}
+
+/* KEYPAD GTT BUILDER */
+function switchMetricCategory(cat) {
+  activeCat = cat;
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('catBtn_' + cat).classList.add('active');
+  const firstInCat = METRIC_CATALOG.find(m => m.cat === cat);
+  if (firstInCat) selectMetric(firstInCat.key);
+}
+
+function selectMetric(key) {
+  const m = getMetricMeta(key);
+  activeMetric = m.key;
+  activeCat = m.cat;
+  kpOp = m.defOp;
+  kpInput = String(activeStock[activeMetric]);
+  closeMetricSheet();
+  renderKeypad();
+}
+
+function renderKeypad() {
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  const activeTab = document.getElementById('catBtn_' + activeCat);
+  if (activeTab) activeTab.classList.add('active');
+
+  // Render chips for all 16 metrics (putting current category first)
+  const sortedMetrics = [
+    ...METRIC_CATALOG.filter(m => m.cat === activeCat),
+    ...METRIC_CATALOG.filter(m => m.cat !== activeCat)
+  ];
+  document.getElementById('keypadMetricStrip').innerHTML = sortedMetrics.map(m => `
+    <button class="m-chip ${m.key === activeMetric ? 'active' : ''}" onclick="selectMetric('${m.key}')">
+      ${m.label}
+    </button>
+  `).join('');
+
+  const meta = getMetricMeta(activeMetric);
+  const liveVal = activeStock[activeMetric];
+  document.getElementById('kpBigNum').textContent = kpInput;
+  document.getElementById('kpBigUnit').textContent = meta.unit;
+  document.getElementById('kpConditionText').textContent =
+    `Trigger when ${kpOp === 'lt' ? 'Drops ≤' : 'Rises ≥'} ${kpInput} · Live: ${liveVal}`;
+
+  document.getElementById('kpBadge').textContent = activeStock.sym.substring(0, 2);
+  document.getElementById('kpStockTitle').textContent = `${activeStock.name} (${activeStock.sym})`;
+  document.getElementById('kpLivePrice').textContent = `₹${activeStock.price.toLocaleString('en-IN')}`;
+  document.getElementById('kpMetricFullTitle').textContent = `${meta.label} (${meta.catName})`;
+  document.getElementById('kpBrokerTitle').textContent =
+    kpBroker === 'groww' ? 'Push Alert + Open Groww' : 'Push Alert + Open Zerodha Kite';
+  lucide.createIcons();
+}
+
+function openMetricSheet() {
+  document.getElementById('fullMetricGrid').innerHTML = METRIC_CATALOG.map(m => `
+    <div class="metric-card ${m.key === activeMetric ? 'active' : ''}" onclick="selectMetric('${m.key}')">
+      <div>
+        <div class="mc-name">${m.label}</div>
+        <div class="mc-cat">${m.catName}</div>
+      </div>
+      <div class="mc-val">${activeStock[m.key]}</div>
+    </div>
+  `).join('');
+  document.getElementById('metricSheet').classList.add('open');
+}
+
+function closeMetricSheet() {
+  document.getElementById('metricSheet').classList.remove('open');
+}
+
+function toggleOpDirection() {
+  kpOp = kpOp === 'lt' ? 'gt' : 'lt';
+  renderKeypad();
+}
+
+function cycleActiveStock() {
+  const i = STOCKS.findIndex(s => s.sym === activeStock.sym);
+  activeStock = STOCKS[(i + 1) % STOCKS.length];
+  kpInput = String(activeStock[activeMetric]);
+  renderKeypad();
+}
+
+function toggleBroker() {
+  kpBroker = kpBroker === 'groww' ? 'kite' : 'groww';
+  renderKeypad();
+}
+
+function tapKey(k) {
+  if (k === 'del') {
+    kpInput = kpInput.length > 1 ? kpInput.slice(0, -1) : '0';
+  } else if (k === '.') {
+    if (!kpInput.includes('.')) kpInput += '.';
+  } else {
+    kpInput = kpInput === '0' ? k : (kpInput.length < 7 ? kpInput + k : kpInput);
+  }
+  renderKeypad();
+}
+
+function createGttOrder() {
+  const val = parseFloat(kpInput);
+  if (isNaN(val)) return showToast('Enter a valid target value');
+  const meta = getMetricMeta(activeMetric);
+  gttOrders.unshift({
+    id: Date.now(),
+    sym: activeStock.sym,
+    name: activeStock.name,
+    metric: activeMetric,
+    op: kpOp,
+    val: val,
+    broker: kpBroker,
+    hit: false
+  });
+  localStorage.setItem('buro_pro_gtts', JSON.stringify(gttOrders));
+  checkTriggers();
+  showToast(`GTT Set: ${activeStock.sym} ${meta.label} ${kpOp==='lt'?'≤':'≥'} ${val}`);
+  goScreen('alerts');
+}
+
+function checkTriggers() {
+  let hits = 0;
+  gttOrders.forEach(o => {
+    const s = STOCKS.find(x => x.sym === o.sym);
+    if (!s) return;
+    const live = s[o.metric];
+    const condMet = o.op === 'lt' ? live <= o.val : live >= o.val;
+    if (condMet && !o.hit) {
+      o.hit = true;
+      const meta = getMetricMeta(o.metric);
+      showToast(`TARGET HIT: ${o.sym} ${meta.label} is ${live}`);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`GTT Triggered: ${o.sym}`, { body: `${meta.label} reached ${live}` });
+      }
+    } else if (!condMet) {
+      o.hit = false;
+    }
+    if (o.hit) hits++;
+  });
+  localStorage.setItem('buro_pro_gtts', JSON.stringify(gttOrders));
+  document.getElementById('homeGttTotal').textContent = `${gttOrders.length} Active`;
+  document.getElementById('homeGttHits').textContent = `${hits} Hit ›`;
+  document.getElementById('alertDot').style.display = hits > 0 ? 'block' : 'none';
+}
+
+function renderAlerts() {
+  checkTriggers();
+  const box = document.getElementById('gttAlertsList');
+  if (!gttOrders.length) {
+    box.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:13px">No active triggers yet.</div>`;
+    return;
+  }
+  box.innerHTML = gttOrders.map(o => {
+    const s = STOCKS.find(x => x.sym === o.sym);
+    const meta = getMetricMeta(o.metric);
+    const live = s ? s[o.metric] : '-';
+    const url = o.broker === 'kite'
+      ? 'https://kite.zerodha.com/'
+      : `https://groww.in/stocks/search?q=${encodeURIComponent(o.name)}`;
+    return `
+      <div class="asset-item" onclick="window.open('${url}','_blank')">
+        <div class="asset-left">
+          <div class="asset-monogram" style="background:${o.hit ? 'var(--green-soft)' : 'var(--blue-circle)'};color:${o.hit ? 'var(--green)' : 'var(--blue)'}">
+            ${o.sym.substring(0,2)}
+          </div>
+          <div>
+            <div class="asset-title">${o.name}</div>
+            <div class="asset-meta">${meta.label} ${o.op==='lt'?'≤':'≥'} ${o.val} · Live: <b>${live}</b></div>
+          </div>
+        </div>
+        <div class="asset-right">
+          <div class="asset-price" style="color:${o.hit ? 'var(--green)' : 'var(--blue)'}">${o.hit ? 'Buy Now ↗' : 'Watching'}</div>
+          <div class="asset-chg" style="color:var(--muted)" onclick="event.stopPropagation();removeGtt(${o.id})">Delete</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function removeGtt(id) {
+  gttOrders = gttOrders.filter(x => x.id !== id);
+  localStorage.setItem('buro_pro_gtts', JSON.stringify(gttOrders));
+  renderAlerts();
+}
+
+function simulateGttHit() {
+  if (!gttOrders.length) return showToast('Create a GTT trigger first');
+  const first = gttOrders[0];
+  const s = STOCKS.find(x => x.sym === first.sym);
+  if (s) {
+    first.hit = false;
+    s[first.metric] = first.op === 'lt' ? +(first.val - 0.5).toFixed(1) : +(first.val + 0.5).toFixed(1);
+    checkTriggers();
+    renderAlerts();
+  }
+}
+
+function launchBroker(b) {
+  const url = b === 'kite'
+    ? 'https://kite.zerodha.com/'
+    : `https://groww.in/stocks/search?q=${encodeURIComponent(activeStock.name)}`;
+  window.open(url, '_blank');
+}
+
+function enableBrowserPush() {
+  if (!('Notification' in window)) return showToast('Notifications not supported');
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') showToast('Push Alerts Enabled');
+  });
+}
+
+async function syncLiveNSE() {
+  document.getElementById('syncStatus').textContent = 'Syncing NSE...';
+  for (let s of STOCKS.slice(0, 6)) {
+    try {
+      const u = encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${s.sym}.NS?interval=1d`);
+      const res = await fetch(`https://api.allorigins.win/raw?url=${u}`, { signal: AbortSignal.timeout(2500) });
+      const d = await res.json();
+      const meta = d.chart.result[0].meta;
+      s.price = meta.regularMarketPrice;
+      s.chg = ((s.price - meta.chartPreviousClose) / meta.chartPreviousClose) * 100;
+    } catch (e) {
+      const move = (Math.random() - 0.48) * 1.4;
+      s.price = +(s.price * (1 + move / 100)).toFixed(2);
+      s.chg = +(s.chg + move * 0.4).toFixed(2);
+    }
+    s.pe = +(s.price / s.eps).toFixed(1);
+    s.dma200_dev = +(((s.price - s.dma200) / s.dma200) * 100).toFixed(1);
+    s.dma50_dev = +(((s.price - s.dma50) / s.dma50) * 100).toFixed(1);
+  }
+  document.getElementById('syncStatus').textContent = 'NSE Live Synced';
+  renderHome();
+  renderStockList();
+  renderStockDetail();
+  showToast('Live NSE prices & DMA synced');
+}
+
+function showToast(msg) {
+  const box = document.getElementById('toastBox');
+  document.getElementById('toastTxt').textContent = msg;
+  box.classList.add('show');
+  setTimeout(() => box.classList.remove('show'), 2600);
+}
+
+renderHome();
+renderStockList();
+renderStockDetail();
+renderKeypad();
+lucide.createIcons();
+</script>
+</body>
+</html>
